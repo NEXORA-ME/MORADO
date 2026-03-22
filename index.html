@@ -28,10 +28,6 @@ body{
   padding:10px;
   margin-bottom:10px;
   border-radius:8px;
-  cursor:pointer;
-}
-.chatBlock:hover{
-  background:#222;
 }
 
 /* Main */
@@ -58,7 +54,7 @@ body{
   cursor:pointer;
 }
 
-/* Dropdown */
+/* Menu */
 #menu{
   position:absolute;
   top:60px;
@@ -77,7 +73,6 @@ body{
   border:none;
   padding:8px;
   border-radius:6px;
-  cursor:pointer;
 }
 
 /* Chat */
@@ -120,7 +115,6 @@ body{
   cursor:pointer;
 }
 
-/* Loader */
 #loader{
   display:none;
   margin:10px;
@@ -131,13 +125,11 @@ body{
 
 <body>
 
-<!-- Sidebar -->
 <div id="sidebar">
   <h3>Chats</h3>
   <div id="chatList"></div>
 </div>
 
-<!-- Main -->
 <div id="main">
 
 <div id="header">
@@ -156,71 +148,101 @@ body{
 
 <div id="inputBar">
   <input id="msgInput" placeholder="Ask Nexora...">
-  <button id="sendBtn" onclick="send()">Send</button>
+  <button id="sendBtn">Send</button>
 </div>
 
 </div>
 
 <script>
-const API = "https://backend-b80q.onrender.com";
+const API = "http://localhost:10000"; // ✅ FIXED
 
+// ✅ DOM references
+const profilePic = document.getElementById("profilePic");
+const menu = document.getElementById("menu");
+const userInfo = document.getElementById("userInfo");
+const chat = document.getElementById("chat");
+const msgInput = document.getElementById("msgInput");
+const loader = document.getElementById("loader");
+const chatList = document.getElementById("chatList");
+const sendBtn = document.getElementById("sendBtn");
 
+// ✅ User data
 const email = localStorage.getItem("userEmail");
 const name = localStorage.getItem("userName");
 const pic = localStorage.getItem("userPic");
 
 if(!email){
-  window.location.href="login.html";
+  alert("Login first");
+  // window.location.href="login.html";
 }
 
-profilePic.src = pic;
-userInfo.innerHTML = `<b>${name}</b><br>${email}`;
+profilePic.src = pic || "https://via.placeholder.com/40";
+userInfo.innerHTML = `<b>${name || "User"}</b><br>${email}`;
 
+// Toggle menu
 profilePic.onclick = () =>{
-  menu.style.display = menu.style.display=="block"?"none":"block";
-}
+  menu.style.display = menu.style.display==="block"?"none":"block";
+};
 
 function showCookies(){
-  alert(document.cookie || "No cookies stored");
+  alert(document.cookie || "No cookies");
 }
 
 function logout(){
   localStorage.clear();
-  window.location.href="login.html";
+  location.reload();
 }
 
-/* Load Chat History */
-fetch(API+"/chats/"+email)
-.then(r=>r.json())
-.then(data=>{
-  data.forEach(c=>{
-    const div=document.createElement("div");
-    div.className="chatBlock";
-    div.innerText=c.user;
-    chatList.appendChild(div);
-  })
+// ✅ Load chat history
+fetch(API + "/chats/" + email)
+.then(r => r.json())
+.then(data => {
+  data.forEach(msg => {
+    const div = document.createElement("div");
+    div.className = "msg " + (msg.role === "user" ? "user" : "ai");
+    div.innerText = msg.parts[0].text;
+    chat.appendChild(div);
+  });
+
+  chat.scrollTop = chat.scrollHeight;
 });
 
-/* Send Message */
+// ✅ Send message
 function send(){
-  const msg = msgInput.value;
+  const msg = msgInput.value.trim();
   if(!msg) return;
 
+  // show user msg
   chat.innerHTML += `<div class="msg user">${msg}</div>`;
   msgInput.value="";
   loader.style.display="block";
+  chat.scrollTop = chat.scrollHeight;
 
-  fetch(API+"/chat",{
+  fetch(API + "/chat", {
     method:"POST",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({email,message:msg})
+    body:JSON.stringify({ email, message: msg })
   })
   .then(r=>r.json())
   .then(d=>{
     loader.style.display="none";
     chat.innerHTML += `<div class="msg ai">${d.reply}</div>`;
+    chat.scrollTop = chat.scrollHeight;
+  })
+  .catch(()=>{
+    loader.style.display="none";
+    chat.innerHTML += `<div class="msg ai">Error connecting to server</div>`;
   });
 }
+
+// ✅ Enter key support
+msgInput.addEventListener("keypress", e=>{
+  if(e.key === "Enter") send();
+});
+
+// Button click
+sendBtn.onclick = send;
+
 </script>
 
 </body>
