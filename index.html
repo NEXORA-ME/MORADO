@@ -1,249 +1,189 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Nexora AI</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexora AI</title>
 
-<style>
-body{
-  margin:0;
-  background:#0b0b0b;
-  color:#ffffff;
-  font-family:Segoe UI, Arial;
-  display:flex;
-  height:100vh;
-}
+    <link rel="stylesheet" href="style.css">
 
-/* Sidebar */
-#sidebar{
-  width:260px;
-  background:#111;
-  border-right:1px solid #222;
-  padding:10px;
-  overflow-y:auto;
-}
-.chatBlock{
-  background:#1a1a1a;
-  padding:10px;
-  margin-bottom:10px;
-  border-radius:8px;
-}
+    <!-- Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-/* Main */
-#main{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-}
+    <!-- Highlight.js -->
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
 
-/* Header */
-#header{
-  height:60px;
-  background:#111;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 15px;
-  border-bottom:1px solid #222;
-}
-#profilePic{
-  width:40px;
-  height:40px;
-  border-radius:50%;
-  cursor:pointer;
-}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
-/* Menu */
-#menu{
-  position:absolute;
-  top:60px;
-  right:15px;
-  background:#111;
-  border:1px solid #333;
-  border-radius:8px;
-  display:none;
-  padding:10px;
-}
-#menu button{
-  width:100%;
-  margin-top:8px;
-  background:#222;
-  color:white;
-  border:none;
-  padding:8px;
-  border-radius:6px;
-}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-/* Chat */
-#chat{
-  flex:1;
-  padding:20px;
-  overflow-y:auto;
-}
-.msg{
-  margin-bottom:15px;
-  padding:12px;
-  border-radius:10px;
-  max-width:70%;
-}
-.user{background:#1f1f1f;margin-left:auto;}
-.ai{background:#2a2a2a;}
-
-/* Input */
-#inputBar{
-  display:flex;
-  padding:10px;
-  background:#111;
-  border-top:1px solid #222;
-}
-#msgInput{
-  flex:1;
-  padding:12px;
-  background:#1a1a1a;
-  border:none;
-  color:white;
-  border-radius:8px;
-}
-#sendBtn{
-  margin-left:10px;
-  padding:12px 20px;
-  background:#ffffff;
-  color:black;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-}
-
-#loader{
-  display:none;
-  margin:10px;
-  color:#aaa;
-}
-</style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
 </head>
 
 <body>
 
-<div id="sidebar">
-  <h3>Chats</h3>
-  <div id="chatList"></div>
+<div id="app">
+
+    <!-- Sidebar -->
+    <aside id="sidebar">
+
+        <div class="sidebar-top">
+
+            <button id="newChatBtn">
+                <span>+</span>
+                New Chat
+            </button>
+
+        </div>
+
+        <div id="chatHistory">
+        </div>
+
+        <div class="sidebar-bottom">
+
+            <img id="sidebarUserPic" alt="User">
+
+            <div class="sidebar-user-info">
+                <div id="sidebarUserName">User</div>
+                <div class="sidebar-label">
+                    Logged In
+                </div>
+            </div>
+
+        </div>
+
+    </aside>
+
+    <!-- Main -->
+    <main id="main">
+
+        <!-- Header -->
+        <header id="header">
+
+            <div class="header-left">
+
+                <button id="mobileMenuBtn">
+                    ☰
+                </button>
+
+                <div class="logo">
+                    Nexora AI
+                </div>
+
+            </div>
+
+            <div class="header-right">
+
+                <img id="profilePic"
+                alt="Profile">
+
+            </div>
+
+        </header>
+
+        <!-- Account Menu -->
+        <div id="accountMenu">
+
+            <div id="userInfo">
+            </div>
+
+            <button id="logoutBtn">
+                Logout
+            </button>
+
+        </div>
+
+        <!-- Chat Area -->
+        <div id="chatContainer">
+
+            <!-- Welcome -->
+            <section id="welcomeScreen">
+
+                <h1>
+                    What can I help with?
+                </h1>
+
+                <div class="welcome-grid">
+
+                    <button class="suggestion">
+                        Explain Quantum Physics
+                    </button>
+
+                    <button class="suggestion">
+                        Solve Mathematics Problems
+                    </button>
+
+                    <button class="suggestion">
+                        Write JavaScript Code
+                    </button>
+
+                    <button class="suggestion">
+                        Generate Startup Ideas
+                    </button>
+
+                </div>
+
+            </section>
+
+            <!-- Messages -->
+            <div id="chat">
+            </div>
+
+        </div>
+
+        <!-- Thinking Animation -->
+        <div id="thinkingBox">
+
+            <div class="thinking-border"></div>
+
+            <div class="thinking-text">
+                Nexora is thinking...
+            </div>
+
+        </div>
+
+        <!-- Input -->
+        <div id="inputArea">
+
+            <div id="inputWrapper">
+
+                <textarea
+                    id="msgInput"
+                    placeholder="Message Nexora..."
+                    rows="1"></textarea>
+
+                <button id="sendBtn">
+                    ↑
+                </button>
+
+            </div>
+
+        </div>
+
+    </main>
+
 </div>
 
-<div id="main">
+<!-- Message Template -->
+<template id="messageTemplate">
 
-<div id="header">
-  <h3>Nexora AI</h3>
-  <img id="profilePic">
-</div>
+    <div class="message">
 
-<div id="menu">
-  <div id="userInfo"></div>
-  <button onclick="showCookies()">View Cookies</button>
-  <button onclick="logout()">Logout</button>
-</div>
+        <div class="avatar">
+        </div>
 
-<div id="chat"></div>
-<div id="loader">Nexora is thinking…</div>
+        <div class="message-content">
+        </div>
 
-<div id="inputBar">
-  <input id="msgInput" placeholder="Ask Nexora...">
-  <button id="sendBtn">Send</button>
-</div>
+    </div>
 
-</div>
+</template>
 
-<script>
-const API = "https://backend-b80q.onrender.com"; // ✅ FIXED
-
-// ✅ DOM references
-const profilePic = document.getElementById("profilePic");
-const menu = document.getElementById("menu");
-const userInfo = document.getElementById("userInfo");
-const chat = document.getElementById("chat");
-const msgInput = document.getElementById("msgInput");
-const loader = document.getElementById("loader");
-const chatList = document.getElementById("chatList");
-const sendBtn = document.getElementById("sendBtn");
-
-// ✅ User data
-const email = localStorage.getItem("userEmail");
-const name = localStorage.getItem("userName");
-const pic = localStorage.getItem("userPic");
-
-if(!email){
-  alert("Login first");
-  // window.location.href="login.html";
-}
-
-profilePic.src = pic || "https://via.placeholder.com/40";
-userInfo.innerHTML = `<b>${name || "User"}</b><br>${email}`;
-
-// Toggle menu
-profilePic.onclick = () =>{
-  menu.style.display = menu.style.display==="block"?"none":"block";
-};
-
-function showCookies(){
-  alert(document.cookie || "No cookies");
-}
-
-function logout(){
-  localStorage.clear();
-  location.reload();
-}
-
-// ✅ Load chat history
-fetch(API + "/chats/" + email)
-.then(r => r.json())
-.then(data => {
-  data.forEach(msg => {
-    const div = document.createElement("div");
-    div.className = "msg " + (msg.role === "user" ? "user" : "ai");
-    div.innerText = msg.parts[0].text;
-    chat.appendChild(div);
-  });
-
-  chat.scrollTop = chat.scrollHeight;
-});
-
-// ✅ Send message
-function send(){
-  const msg = msgInput.value.trim();
-  if(!msg) return;
-
-  // show user msg
-  chat.innerHTML += `<div class="msg user">${msg}</div>`;
-  msgInput.value="";
-  loader.style.display="block";
-  chat.scrollTop = chat.scrollHeight;
-
-  fetch(API + "/chat", {
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({ email, message: msg })
-  })
-  .then(r=>r.json())
-  .then(d=>{
-    loader.style.display="none";
-    chat.innerHTML += `<div class="msg ai">${d.reply}</div>`;
-    chat.scrollTop = chat.scrollHeight;
-  })
-  .catch(()=>{
-    loader.style.display="none";
-    chat.innerHTML += `<div class="msg ai">Error connecting to server</div>`;
-  });
-}
-
-// ✅ Enter key support
-msgInput.addEventListener("keypress", e=>{
-  if(e.key === "Enter") send();
-});
-
-// Button click
-sendBtn.onclick = send;
-
-</script>
+<script src="script.js"></script>
 
 </body>
 </html>
+```
